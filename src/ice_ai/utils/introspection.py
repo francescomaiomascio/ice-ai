@@ -7,7 +7,7 @@ from ice_ai.version import ICE_AI_VERSION
 
 
 # ============================================================
-# CORE INTROSPECTION API
+# CORE INTROSPECTION API (PURE, DETERMINISTIC)
 # ============================================================
 
 def introspect() -> Dict[str, Any]:
@@ -17,14 +17,6 @@ def introspect() -> Dict[str, Any]:
     ⚠️ NON istanzia agenti
     ⚠️ NON accede a runtime / engine
     ⚠️ NON dipende da sessioni o workspace
-
-    Usata da:
-    - engine
-    - orchestrator
-    - UI / IDE
-    - CLI
-    - diagnostics
-    - export JSON
     """
 
     catalog = ICE_AI_CATALOG
@@ -48,7 +40,7 @@ def introspect() -> Dict[str, Any]:
 
 
 # ============================================================
-# INDEX BUILDERS (PURE)
+# INDEX BUILDERS (PURE FUNCTIONS)
 # ============================================================
 
 def _index_domains(agents) -> Dict[str, List[str]]:
@@ -99,3 +91,22 @@ def _index_capabilities(agents) -> Dict[str, List[str]]:
             index.setdefault(cap, set()).add(spec.name)
 
     return {k: sorted(v) for k, v in index.items()}
+
+
+# ============================================================
+# SINGLE-ENTRY HELPERS
+# ============================================================
+
+def describe_agent(name: str) -> Dict[str, Any]:
+    """
+    Restituisce la descrizione serializzata di un singolo agente.
+    """
+    spec = ICE_AI_CATALOG.get(name)
+    return spec.to_dict()
+
+
+def describe_catalog() -> Dict[str, Any]:
+    """
+    Restituisce la descrizione completa del catalogo agenti.
+    """
+    return ICE_AI_CATALOG.to_dict()

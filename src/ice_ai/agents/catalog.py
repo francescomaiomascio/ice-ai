@@ -17,7 +17,8 @@ NON FA:
 
 from typing import Dict, Iterable, List
 
-from .spec import AgentSpec
+from ice_ai.agents.capabilities import Capability
+from ice_ai.agents.spec import AgentSpec
 
 
 # =====================================================================
@@ -27,12 +28,6 @@ from .spec import AgentSpec
 class AgentCatalog:
     """
     Catalogo immutabile di AgentSpec.
-
-    È il punto di verità per:
-    - planner cognitivo
-    - routing logico
-    - UI / IDE / CLI
-    - validazione orchestratore
     """
 
     def __init__(self, agents: Iterable[AgentSpec]) -> None:
@@ -45,7 +40,6 @@ class AgentCatalog:
                 )
             registry[spec.name] = spec
 
-        # Stato congelato
         self._agents: Dict[str, AgentSpec] = dict(registry)
 
     # ------------------------------------------------------------------
@@ -76,10 +70,7 @@ class AgentCatalog:
     # ------------------------------------------------------------------
 
     def by_domain(self, domain: str) -> List[AgentSpec]:
-        return [
-            spec for spec in self._agents.values()
-            if domain in spec.domains
-        ]
+        return [s for s in self._agents.values() if domain in s.domains]
 
     def planners(self) -> List[AgentSpec]:
         return [s for s in self._agents.values() if s.is_planner]
@@ -106,8 +97,6 @@ class AgentCatalog:
             },
         }
 
-    # ------------------------------------------------------------------
-
     def __len__(self) -> int:  # pragma: no cover
         return len(self._agents)
 
@@ -116,3 +105,49 @@ class AgentCatalog:
 
     def __repr__(self) -> str:  # pragma: no cover
         return f"<AgentCatalog agents={len(self._agents)}>"
+
+
+# =====================================================================
+# CANONICAL ICE-AI CATALOG
+# =====================================================================
+
+SYSTEM_SPEC = AgentSpec(
+    name="system",
+    description="Global ICE-AI system agent.",
+    domains={"system"},
+    is_system=True,
+    is_observer=True,
+    capabilities={Capability.SYSTEM_INTROSPECT},
+)
+
+CODE_SPEC = AgentSpec(
+    name="code",
+    description="Filesystem and code manipulation agent.",
+    domains={"code"},
+    is_executor=True,
+    is_observer=True,
+    capabilities={
+        Capability.CODE_READ,
+        Capability.CODE_WRITE,
+        Capability.CODE_GENERATE,
+        Capability.CODE_REFACTOR,
+    },
+)
+
+KNOWLEDGE_SPEC = AgentSpec(
+    name="knowledge",
+    description="Knowledge base and RAG agent.",
+    domains={"knowledge"},
+    is_observer=True,
+    capabilities={
+        Capability.KNOWLEDGE_QUERY,
+        Capability.RAG_QUERY,
+        Capability.KNOWLEDGE_SYNC,
+    },
+)
+
+ICE_AI_CATALOG = AgentCatalog([
+    SYSTEM_SPEC,
+    CODE_SPEC,
+    KNOWLEDGE_SPEC,
+])
