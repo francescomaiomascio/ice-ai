@@ -5,7 +5,7 @@ from typing import Dict, Any, List, Optional
 from datetime import datetime
 
 from ice_ai.agents.spec import AgentSpec
-from ice_ai.agents.capabilities import CAP_HISTORY, CAP_REASONING
+from ice_ai.agents.capabilities import Capability
 
 
 # ============================================================================
@@ -64,8 +64,8 @@ class HistorianAgent:
         is_observer=True,
         is_system=False,
         capabilities={
-            CAP_HISTORY,
-            CAP_REASONING,
+            Capability.LOG_SCAN,
+            Capability.LOG_ANALYZE,
         },
         ui_label="History",
         ui_group="Cognition",

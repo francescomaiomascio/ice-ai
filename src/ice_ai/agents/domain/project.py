@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, Optional
 
 from ice_ai.agents.spec import AgentSpec
-from ice_ai.agents.capabilities import CAP_PLANNING, CAP_PROJECT
-from ice_ai.reasoning.planner import build_project_plan
+from ice_ai.agents.capabilities import Capability
 
 
 # ============================================================================
@@ -23,17 +22,6 @@ class ProjectIntent:
     context: Dict[str, Any]
 
 
-@dataclass
-class ProjectPlan:
-    """
-    Piano di progetto normalizzato e serializzabile.
-    """
-    goal: str
-    steps: List[Dict[str, Any]]
-    assumptions: List[str]
-    risks: List[str]
-
-
 # ============================================================================
 # AGENT
 # ============================================================================
@@ -43,26 +31,21 @@ class ProjectAgent:
     ProjectAgent
     ------------
 
-    Responsabilità:
-    - trasformare un goal in un ProjectPlan
-    - NON eseguire
-    - NON scrivere codice
-    - NON chiamare filesystem o runtime
-
-    È un *domain planner*, non un orchestratore.
+    Domain-level project planner.
+    Produces a ProjectIntent → ProjectPlan mapping contract.
     """
 
     spec = AgentSpec(
         name="project-agent",
-        description="Genera piani di progetto ad alto livello a partire da un goal.",
+        description="Defines high-level project planning intent.",
         domains={"workflow", "project"},
         is_planner=True,
         is_executor=False,
         is_observer=False,
         is_system=False,
         capabilities={
-            CAP_PLANNING,
-            CAP_PROJECT,
+            Capability.WORKFLOW_PLAN,
+            Capability.PROJECT_GENERATE,
         },
         ui_label="Project Planner",
         ui_group="Planning",
@@ -72,28 +55,20 @@ class ProjectAgent:
     # PUBLIC API
     # ------------------------------------------------------------------
 
-    def plan(
+    def plan_intent(
         self,
         goal: str,
         *,
         constraints: Optional[Dict[str, Any]] = None,
         context: Optional[Dict[str, Any]] = None,
-    ) -> ProjectPlan:
+    ) -> ProjectIntent:
         """
-        Genera un piano di progetto strutturato.
+        Produce a pure ProjectIntent.
+        NO planning logic is executed here.
         """
 
-        intent = ProjectIntent(
+        return ProjectIntent(
             goal=goal.strip(),
             constraints=constraints or {},
             context=context or {},
-        )
-
-        raw_plan = build_project_plan(intent)
-
-        return ProjectPlan(
-            goal=intent.goal,
-            steps=raw_plan.get("steps", []),
-            assumptions=raw_plan.get("assumptions", []),
-            risks=raw_plan.get("risks", []),
         )

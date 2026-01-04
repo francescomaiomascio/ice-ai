@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Dict, Any, List, Optional
 
 from ice_ai.agents.spec import AgentSpec
-from ice_ai.agents.capabilities import CAP_EXPORT, CAP_IO
+from ice_ai.agents.capabilities import Capability
 
 
 # ============================================================================
@@ -36,8 +36,7 @@ class KnowledgeSyncAgent:
         is_observer=False,
         is_system=False,
         capabilities={
-            CAP_EXPORT,
-            CAP_IO,
+            Capability.KNOWLEDGE_SYNC,
         },
         ui_label="Knowledge Export",
         ui_group="Persistence",
