@@ -1,58 +1,87 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from enum import Enum
 from typing import Any, Dict, List, Optional
 
 
-# ---------------------------------------------------------------------
+# =============================================================================
+# INTENT
+# =============================================================================
+
+class Intent(str, Enum):
+    """
+    Intento cognitivo di alto livello.
+    NON è un'azione runtime.
+    """
+    RESPOND = "respond"        # risposta diretta
+    PLAN = "plan"              # costruzione workflow
+    ANALYZE = "analyze"        # analisi (code, log, testo)
+    VALIDATE = "validate"      # validazione / controllo
+    OBSERVE = "observe"        # scan / indexing / logging
+    SYNTHESIZE = "synthesize"  # sintesi / knowledge / historian
+    EXECUTE = "execute"        # esecuzione concreta
+
+
+# =============================================================================
 # ROUTING DECISION
-# ---------------------------------------------------------------------
+# =============================================================================
 
 @dataclass(frozen=True)
 class RoutingDecision:
     """
-    Decisione cognitiva su cosa fare dopo.
+    Decisione cognitiva pura del sistema ICE-AI.
 
-    NON è un'azione runtime.
-    È una direttiva logica per il sistema.
+    Dice:
+    - CHE TIPO DI PENSIERO serve
+    - PERCHÉ
+    - CON QUALI DATI
+    - QUALI RUOLI sono adatti
     """
 
-    kind: str
-    """
-    Tipo di decisione, es:
-    - "respond"
-    - "plan"
-    - "analyze"
-    - "validate"
-    """
-
+    intent: Intent
     reason: str
+
+    payload: Dict[str, Any] = field(default_factory=dict)
+
+    suggested_roles: List[str] = field(default_factory=list)
     """
-    Motivazione semantica della decisione.
+    Ruoli logici suggeriti:
+    - planner
+    - analyzer
+    - executor
+    - observer
+    - system
     """
 
-    payload: Dict[str, Any] = None
+    confidence: float = 1.0
     """
-    Dati utili per lo step successivo
-    (goal, raw_actions, query, ecc.)
-    """
-
-    next_roles: Optional[List[str]] = None
-    """
-    Ruoli suggeriti (planner, analyzer, validator, ecc.)
+    Quanto è forte questa decisione (0.0 – 1.0).
+    Utile per fallback o multi-routing.
     """
 
 
-# ---------------------------------------------------------------------
-# ROUTER LOGIC (PURE)
-# ---------------------------------------------------------------------
+# =============================================================================
+# ROUTER (PURE LOGIC)
+# =============================================================================
 
 class Router:
     """
-    Logica pura di routing cognitivo.
+    Router cognitivo puro.
 
-    Decide cosa fare DOPO una risposta o un reasoning.
+    NON:
+    - conosce agenti concreti
+    - conosce runtime
+    - istanzia nulla
+
+    FA:
+    - interpreta input + output LLM
+    - produce una RoutingDecision
     """
+
+    # -----------------------------------------------------------------
+    # ENTRYPOINT
+    # -----------------------------------------------------------------
 
     @staticmethod
     def route(
@@ -62,70 +91,148 @@ class Router:
         mode: Optional[str] = None,
     ) -> RoutingDecision:
         """
-        Decide il prossimo passo logico.
-
-        Parametri:
-        - user_query: input originale dell'utente
-        - llm_output: output grezzo del modello (se esiste)
-        - mode: hint esplicito (es. "plan", "explain")
+        Determina il prossimo INTENT cognitivo.
         """
 
+        llm_output = llm_output or {}
+
         # -------------------------------------------------------------
-        # MODE OVERRIDE (esplicito)
+        # 1) MODE ESPLICITO (override umano / UI)
         # -------------------------------------------------------------
 
-        if mode == "plan":
+        if mode:
+            return Router._route_by_mode(
+                mode=mode,
+                user_query=user_query,
+                llm_output=llm_output,
+            )
+
+        # -------------------------------------------------------------
+        # 2) SE LLM HA PRODOTTO AZIONI → PLAN
+        # -------------------------------------------------------------
+
+        if _has_actions(llm_output):
             return RoutingDecision(
-                kind="plan",
-                reason="Explicit planning mode requested.",
+                intent=Intent.PLAN,
+                reason="Structured actions detected in model output.",
                 payload={
                     "goal": user_query,
-                    "raw_actions": llm_output.get("actions") if llm_output else None,
+                    "actions": llm_output.get("actions"),
                 },
-                next_roles=["planner"],
-            )
-
-        if mode == "explain":
-            return RoutingDecision(
-                kind="respond",
-                reason="Explicit explanation mode.",
-                payload={
-                    "answer": llm_output.get("answer") if llm_output else None,
-                },
+                suggested_roles=["planner"],
+                confidence=0.9,
             )
 
         # -------------------------------------------------------------
-        # HEURISTIC ROUTING
+        # 3) SE CI SONO ISSUE / ERRORI → VALIDATE
         # -------------------------------------------------------------
 
-        # Se il modello ha prodotto azioni strutturate → pianificazione
-        if llm_output and llm_output.get("actions"):
+        if _has_issues(llm_output):
             return RoutingDecision(
-                kind="plan",
-                reason="LLM produced structured actions.",
-                payload={
-                    "goal": user_query,
-                    "raw_actions": llm_output.get("actions"),
-                },
-                next_roles=["planner"],
-            )
-
-        # Se contiene errori / warning → validazione
-        if llm_output and llm_output.get("issues"):
-            return RoutingDecision(
-                kind="validate",
-                reason="Potential issues detected.",
+                intent=Intent.VALIDATE,
+                reason="Potential issues or errors detected.",
                 payload={
                     "issues": llm_output.get("issues"),
                 },
-                next_roles=["validator"],
+                suggested_roles=["validator"],
+                confidence=0.8,
             )
 
-        # Default: risposta diretta
+        # -------------------------------------------------------------
+        # 4) SE OUTPUT È ANALITICO → ANALYZE
+        # -------------------------------------------------------------
+
+        if _looks_like_analysis(llm_output):
+            return RoutingDecision(
+                intent=Intent.ANALYZE,
+                reason="Analytical content detected.",
+                payload={
+                    "content": llm_output,
+                },
+                suggested_roles=["analyzer"],
+                confidence=0.6,
+            )
+
+        # -------------------------------------------------------------
+        # 5) DEFAULT → RESPOND
+        # -------------------------------------------------------------
+
         return RoutingDecision(
-            kind="respond",
-            reason="No further processing required.",
+            intent=Intent.RESPOND,
+            reason="No further cognitive processing required.",
             payload={
-                "answer": llm_output.get("answer") if llm_output else None,
+                "answer": llm_output.get("answer"),
             },
+            suggested_roles=[],
+            confidence=0.5,
         )
+
+    # -----------------------------------------------------------------
+    # MODE ROUTING
+    # -----------------------------------------------------------------
+
+    @staticmethod
+    def _route_by_mode(
+        *,
+        mode: str,
+        user_query: str,
+        llm_output: Dict[str, Any],
+    ) -> RoutingDecision:
+        """
+        Routing deterministico per mode esplicito.
+        """
+
+        if mode == "plan":
+            return RoutingDecision(
+                intent=Intent.PLAN,
+                reason="Explicit planning mode requested.",
+                payload={"goal": user_query},
+                suggested_roles=["planner"],
+                confidence=1.0,
+            )
+
+        if mode == "analyze":
+            return RoutingDecision(
+                intent=Intent.ANALYZE,
+                reason="Explicit analysis mode requested.",
+                payload={"content": user_query},
+                suggested_roles=["analyzer"],
+                confidence=1.0,
+            )
+
+        if mode == "validate":
+            return RoutingDecision(
+                intent=Intent.VALIDATE,
+                reason="Explicit validation mode requested.",
+                payload={"content": user_query},
+                suggested_roles=["validator"],
+                confidence=1.0,
+            )
+
+        return RoutingDecision(
+            intent=Intent.RESPOND,
+            reason=f"Unknown mode '{mode}', fallback to respond.",
+            payload={"answer": llm_output.get("answer")},
+            confidence=0.3,
+        )
+
+
+# =============================================================================
+# HEURISTIC HELPERS (PURE)
+# =============================================================================
+
+def _has_actions(output: Dict[str, Any]) -> bool:
+    actions = output.get("actions")
+    return isinstance(actions, list) and len(actions) > 0
+
+
+def _has_issues(output: Dict[str, Any]) -> bool:
+    issues = output.get("issues")
+    return isinstance(issues, list) and len(issues) > 0
+
+
+def _looks_like_analysis(output: Dict[str, Any]) -> bool:
+    return any(
+        key in output
+        for key in ("reasoning", "analysis", "thoughts", "insight")
+    )

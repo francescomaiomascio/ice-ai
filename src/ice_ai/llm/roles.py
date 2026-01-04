@@ -3,6 +3,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, Optional
 
+"""
+Cognitive roles.
+Used by reasoning, routing and prompt composition.
+Not tied to AgentSpec or runtime permissions.
+"""
+
 
 @dataclass(frozen=True)
 class CognitiveRole:
