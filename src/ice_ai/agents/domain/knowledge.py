@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 
 from ice_ai.agents.spec import AgentSpec
-from ice_ai.agents.capabilities import CAP_KNOWLEDGE, CAP_REASONING
-from ice_ai.reasoning.decision import synthesize_knowledge
+from ice_ai.agents.capabilities import Capability
 
 
 # ============================================================================
@@ -43,62 +42,29 @@ class KnowledgeAgent:
     --------------
 
     Responsabilità:
-    - ragionare su conoscenza esistente
-    - fondere query + contesto + fonti
-    - produrre risposte spiegabili
+    - query conoscenza
+    - RAG
+    - sync knowledge
 
     NON:
-    - indicizza
-    - persiste
-    - esegue query tecniche
+    - prende decisioni
+    - sintetizza output
+    - coordina reasoning
     """
 
     spec = AgentSpec(
-        name="knowledge-agent",
-        description="Agente di reasoning knowledge-driven (RAG-agnostic).",
+        name="knowledge",
+        description="Knowledge base and RAG agent.",
         domains={"knowledge"},
         is_planner=False,
         is_executor=False,
         is_observer=True,
         is_system=False,
         capabilities={
-            CAP_KNOWLEDGE,
-            CAP_REASONING,
+            Capability.KNOWLEDGE_QUERY,
+            Capability.RAG_QUERY,
+            Capability.KNOWLEDGE_SYNC,
         },
         ui_label="Knowledge",
-        ui_group="Cognition",
+        ui_group="domain",
     )
-
-    # ------------------------------------------------------------------
-    # PUBLIC API
-    # ------------------------------------------------------------------
-
-    def query(
-        self,
-        text: str,
-        *,
-        context: Optional[Dict[str, Any]] = None,
-        sources: Optional[List[str]] = None,
-    ) -> KnowledgeResponse:
-        """
-        Risponde a una query basata su conoscenza disponibile.
-        """
-
-        q = KnowledgeQuery(
-            query=text.strip(),
-            context=context or {},
-            sources=sources or [],
-        )
-
-        result = synthesize_knowledge(
-            query=q.query,
-            context=q.context,
-            sources=q.sources,
-        )
-
-        return KnowledgeResponse(
-            answer=result.get("answer", ""),
-            evidence=result.get("evidence", []),
-            confidence=float(result.get("confidence", 0.0)),
-            gaps=result.get("gaps", []),
-        )

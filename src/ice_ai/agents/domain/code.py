@@ -1,49 +1,49 @@
 from __future__ import annotations
 
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, Optional
 from pathlib import Path
 
 from ice_ai.agents.spec import AgentSpec
 
 
+# ============================================================
+# DECLARATIVE AGENT SPEC (USED BY CATALOG / INTROSPECTION)
+# ============================================================
+
+CODE_AGENT_SPEC = AgentSpec(
+    name="code",
+    description="Filesystem and code manipulation agent.",
+    domains={"code"},
+    is_executor=True,
+    is_observer=True,
+    capabilities={
+        # filesystem
+        "fs.read",
+        "fs.write",
+        "fs.exists",
+        "fs.list",
+
+        # code operations
+        "code.generate",
+        "code.refactor",
+        "code.explain",
+    },
+    ui_label="Code",
+    ui_group="domain",
+)
+
+
+# ============================================================
+# RUNTIME AGENT (NOT USED BY INTROSPECTION)
+# ============================================================
+
 class CodeAgent:
     """
-    CodeAgent (DOMAIN)
+    Runtime implementation for the Code domain.
 
-    Responsabilità:
-    - lettura file
-    - scrittura file
-    - introspezione filesystem
-    - operazioni di codice dichiarative (NO orchestrazione)
-    - supporto a codegen / refactor tramite LLM o CodeModel (futuro)
-
-    NON:
-    - decide workflow
-    - non gestisce lifecycle
-    - non parla direttamente con IDE
+    ⚠️ NOT introspected
+    ⚠️ NOT instantiated by catalog
     """
-
-    spec = AgentSpec(
-        name="code",
-        description="Filesystem and code manipulation agent.",
-        domains={"code"},
-        is_executor=True,
-        is_observer=True,
-        capabilities={
-            # filesystem
-            "fs.read",
-            "fs.write",
-            "fs.exists",
-            "fs.list",
-
-            # code operations
-            "code.generate",
-            "code.refactor",
-            "code.explain",
-        },
-        ui_label="Code",
-        ui_group="domain",
-    )
 
     # ------------------------------------------------------------------
     # FILESYSTEM
@@ -110,23 +110,20 @@ class CodeAgent:
                 "path": path,
             }
 
-        entries = []
-        for e in p.iterdir():
-            entries.append(
+        return {
+            "ok": True,
+            "path": path,
+            "entries": [
                 {
                     "name": e.name,
                     "type": "dir" if e.is_dir() else "file",
                 }
-            )
-
-        return {
-            "ok": True,
-            "path": path,
-            "entries": entries,
+                for e in p.iterdir()
+            ],
         }
 
     # ------------------------------------------------------------------
-    # CODE OPERATIONS (DECLARATIVE)
+    # DECLARATIVE CODE OPS (STUBS)
     # ------------------------------------------------------------------
 
     def generate_code(
@@ -134,42 +131,23 @@ class CodeAgent:
         instruction: str,
         language: Optional[str] = None,
     ) -> Dict[str, Any]:
-        """
-        Placeholder dichiarativo.
-        Il backend reale verrà agganciato via llm.adapter o codemodel.
-        """
-        header = f"# Generated code\n# Instruction: {instruction}\n"
-        if language:
-            header += f"# Language: {language}\n"
-
         return {
             "ok": True,
-            "output": header,
-            "note": "code generation stub (no LLM attached)",
+            "output": f"# Generated code\n# Instruction: {instruction}",
+            "note": "code generation stub",
         }
 
-    def refactor_code(
-        self,
-        code: str,
-        goal: str,
-    ) -> Dict[str, Any]:
-        """
-        Refactor dichiarativo (stub).
-        """
+    def refactor_code(self, code: str, goal: str) -> Dict[str, Any]:
         return {
             "ok": True,
             "goal": goal,
-            "original_length": len(code),
             "proposed_code": f"# Refactor goal: {goal}\n{code}",
-            "note": "refactor stub (no LLM attached)",
+            "note": "refactor stub",
         }
 
-    def explain_code(
-        self,
-        code: str,
-    ) -> Dict[str, Any]:
+    def explain_code(self, code: str) -> Dict[str, Any]:
         return {
             "ok": True,
             "length": len(code),
-            "explanation": "Code explanation not available (stub).",
+            "explanation": "Explanation stub.",
         }
