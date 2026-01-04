@@ -18,6 +18,11 @@ class CognitiveScore:
     - qualità del ragionamento
     - utilità per il sistema
     - affidabilità percepita
+
+    NOT suitable for:
+    - runtime optimization
+    - billing
+    - performance metrics
     """
 
     clarity: float          # chiarezza espositiva
@@ -65,6 +70,9 @@ class ScoringProfile:
     Serve a:
     - pesare diversamente i criteri
     - confrontare output alternativi
+
+    Declarative cognitive scoring profile.
+    Used only at reasoning / evaluation level.
     """
 
     name: str

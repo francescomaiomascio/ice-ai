@@ -1,18 +1,18 @@
 from __future__ import annotations
 
 """
-Agent Catalog — registro statico degli agenti ICE-AI.
+Agent Catalog — registro canonico degli agenti ICE-AI.
 
 RESPONSABILITÀ:
 - dichiarare quali agenti ESISTONO
 - fornire introspezione stabile
-- supportare routing / planning / UI / CLI
+- supportare planning / routing / UI / CLI
 
 NON FA:
 - istanziazione
 - esecuzione
-- binding runtime
-- dipendenze engine
+- import di agent runtime
+- binding engine / LLM / filesystem
 """
 
 from typing import Dict, Iterable, List
@@ -20,28 +20,32 @@ from typing import Dict, Iterable, List
 from .spec import AgentSpec
 
 
+# =====================================================================
+# AGENT CATALOG
+# =====================================================================
+
 class AgentCatalog:
     """
     Catalogo immutabile di AgentSpec.
 
     È il punto di verità per:
-    - orchestrator logico
-    - planner
-    - routing LLM
-    - UI / CLI / IDE
+    - planner cognitivo
+    - routing logico
+    - UI / IDE / CLI
+    - validazione orchestratore
     """
 
     def __init__(self, agents: Iterable[AgentSpec]) -> None:
         registry: Dict[str, AgentSpec] = {}
 
-        for agent in agents:
-            if agent.name in registry:
+        for spec in agents:
+            if spec.name in registry:
                 raise ValueError(
-                    f"Duplicate AgentSpec name detected: {agent.name}"
+                    f"Duplicate AgentSpec name detected: {spec.name}"
                 )
-            registry[agent.name] = agent
+            registry[spec.name] = spec
 
-        # congeliamo lo stato interno
+        # Stato congelato
         self._agents: Dict[str, AgentSpec] = dict(registry)
 
     # ------------------------------------------------------------------
@@ -49,7 +53,6 @@ class AgentCatalog:
     # ------------------------------------------------------------------
 
     def get(self, name: str) -> AgentSpec:
-        """Ritorna un AgentSpec per nome."""
         try:
             return self._agents[name]
         except KeyError:
@@ -63,7 +66,6 @@ class AgentCatalog:
     # ------------------------------------------------------------------
 
     def all(self) -> List[AgentSpec]:
-        """Ritorna tutti gli agenti (ordine deterministico)."""
         return list(sorted(self._agents.values(), key=lambda a: a.name))
 
     def names(self) -> List[str]:
@@ -75,37 +77,36 @@ class AgentCatalog:
 
     def by_domain(self, domain: str) -> List[AgentSpec]:
         return [
-            a for a in self._agents.values()
-            if domain in a.domains
+            spec for spec in self._agents.values()
+            if domain in spec.domains
         ]
 
     def planners(self) -> List[AgentSpec]:
-        return [a for a in self._agents.values() if a.is_planner]
+        return [s for s in self._agents.values() if s.is_planner]
 
     def executors(self) -> List[AgentSpec]:
-        return [a for a in self._agents.values() if a.is_executor]
+        return [s for s in self._agents.values() if s.is_executor]
 
     def observers(self) -> List[AgentSpec]:
-        return [a for a in self._agents.values() if a.is_observer]
+        return [s for s in self._agents.values() if s.is_observer]
 
     def system_agents(self) -> List[AgentSpec]:
-        return [a for a in self._agents.values() if a.is_system]
+        return [s for s in self._agents.values() if s.is_system]
 
     # ------------------------------------------------------------------
     # INTROSPECTION
     # ------------------------------------------------------------------
 
     def to_dict(self) -> Dict[str, object]:
-        """
-        Snapshot serializzabile del catalogo.
-        """
         return {
             "total_agents": len(self._agents),
             "agents": {
-                name: agent.to_dict()
-                for name, agent in self._agents.items()
+                name: spec.to_dict()
+                for name, spec in self._agents.items()
             },
         }
+
+    # ------------------------------------------------------------------
 
     def __len__(self) -> int:  # pragma: no cover
         return len(self._agents)
