@@ -112,7 +112,7 @@ class AgentSpec:
 
     def to_dict(self) -> Dict[str, object]:
         """
-        Rappresentazione serializzabile e stabile.
+        Rappresentazione serializzabile e stabile (PUBLIC CONTRACT).
         """
         return {
             "name": self.name,
@@ -125,16 +125,15 @@ class AgentSpec:
                 "system": self.is_system,
             },
             "capabilities": sorted(self.capabilities),
-            "governance": {
-                "version": self.version,
-                "experimental": self.experimental,
-                "deprecated": self.deprecated,
-            },
+            "version": self.version,
+            "experimental": self.experimental,
+            "deprecated": self.deprecated,
             "ui": {
                 "label": self.ui_label,
                 "group": self.ui_group,
             },
         }
+
 
     # ==================================================================
     # CONVENIENCE
