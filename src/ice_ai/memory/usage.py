@@ -159,3 +159,7 @@ class MemoryUsagePolicy:
         # -------------------------------------------------------------
 
         return True
+
+
+# API pubblica del dominio memory
+MemoryUsage = MemoryUsagePolicy

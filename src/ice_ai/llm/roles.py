@@ -54,6 +54,10 @@ class CognitiveRole:
         }
 
 
+# alias semantico pubblico
+LLMRole = CognitiveRole
+
+
 # ---------------------------------------------------------------------
 # RUOLI CANONICI ICE-AI
 # ---------------------------------------------------------------------
