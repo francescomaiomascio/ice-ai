@@ -177,3 +177,26 @@ PROMPT_REGISTRY = {
     "modes": MODE_DIRECTIVES,
     "lifecycle": LIFECYCLE_DIRECTIVES,
 }
+
+
+
+
+# =====================================================================
+# PUBLIC CANONICAL EXPORTS (STABLE API)
+# =====================================================================
+
+CANONICAL_PROMPT = CONSTITUTION
+SYSTEM_ROLE_PROMPT = SYSTEM_DIRECTIVE
+
+ROLE_PROMPTS = ROLE_DIRECTIVES
+MODE_PROMPTS = MODE_DIRECTIVES
+LIFECYCLE_PROMPTS = LIFECYCLE_DIRECTIVES
+
+PROMPT_COMPONENTS = {
+    "canonical": CANONICAL_PROMPT,
+    "system_role": SYSTEM_ROLE_PROMPT,
+    "system_rules": SYSTEM_HARD_RULES,
+    "roles": ROLE_PROMPTS,
+    "modes": MODE_PROMPTS,
+    "lifecycle": LIFECYCLE_PROMPTS,
+}

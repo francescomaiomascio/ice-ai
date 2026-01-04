@@ -175,3 +175,11 @@ class AgentCapabilities:
             },
             "capabilities": sorted(self.capabilities),
         }
+    
+    def with_capability(self, cap: str) -> "AgentCapabilities":
+        """
+        Return a new AgentCapabilities with a single capability added.
+        Convenience wrapper around with_capabilities().
+        """
+        return self.with_capabilities(cap)
+

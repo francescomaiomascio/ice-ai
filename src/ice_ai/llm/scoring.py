@@ -96,6 +96,10 @@ class ScoringProfile:
         return total / weight_sum if weight_sum > 0 else 0.0
 
 
+# API pubblica del dominio LLM
+AgentScore = CognitiveScore
+
+
 # ---------------------------------------------------------------------
 # PROFILI CANONICI
 # ---------------------------------------------------------------------

@@ -50,6 +50,10 @@ class CognitiveMode:
         }
 
 
+# alias semantico pubblico
+LLMMode = CognitiveMode
+
+
 # ---------------------------------------------------------------------
 # MODI COGNITIVI CANONICI
 # ---------------------------------------------------------------------
