@@ -2,7 +2,7 @@
 
 [![ICE Ecosystem](https://img.shields.io/badge/ICE-Ecosystem-8FB9FF?style=flat)](#)
 [![Docs](https://img.shields.io/badge/docs-ICE%20Docs-8FB9FF?style=flat)](https://github.com/francescomaiomascio/ice-docs)
-[![Status](https://img.shields.io/badge=status-active%20development-6B7280?style=flat)](#)
+[![Status](https://img.shields.io/badge/status-active--development-6B7280?style=flat)](#)
 [![Language](https://img.shields.io/badge/python-3.x-111827?style=flat)](#)
 [![License](https://img.shields.io/badge/license-MIT-7A7CFF?style=flat)](#)
 
