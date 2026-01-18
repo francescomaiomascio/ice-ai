@@ -1,19 +1,76 @@
 # ICE AI
-
-[![ICE Ecosystem](https://img.shields.io/badge/ICE-Ecosystem-8FB9FF?style=flat)](#)
-[![Docs](https://img.shields.io/badge/docs-ICE%20Docs-8FB9FF?style=flat)](https://github.com/francescomaiomascio/ice-docs)
-[![Status](https://img.shields.io/badge/status-active--development-6B7280?style=flat)](#)
-[![Language](https://img.shields.io/badge/python-3.x-111827?style=flat)](#)
-[![License](https://img.shields.io/badge/license-MIT-7A7CFF?style=flat)](#)
+## Agentic Intelligence Layer of the ICE Ecosystem
 
 ICE AI is the **agentic intelligence layer** of the ICE ecosystem.
 
-It defines how intelligent agents reason, plan, analyze, and act across
-codebases, knowledge domains, workflows, and system state.
+It is responsible for **reasoning, planning, analysis, and decision formation**
+across codebases, knowledge domains, workflows, and system state.
 
-ICE AI does not provide raw models.
-It provides **structured intelligence**, **decision-making**, and
-**agent coordination** on top of underlying runtimes and cognition layers.
+ICE AI does not execute actions.
+ICE AI does not authorize behavior.
+It produces **structured intent and decisions** under explicit constraints.
+
+---
+
+## Foundation Dependency
+
+This project derives its assumptions, invariants, and boundaries from  
+**ICE Foundation v1.0.0**.
+
+ICE Foundation defines what is valid.  
+ICE AI operates only within those constraints.
+
+Any intelligent behavior that violates Foundation axioms or invariants
+invalidates ICE compliance.
+
+---
+
+## Position in the ICE Architecture
+
+ICE AI occupies a precise position in the ICE hierarchy:
+
+**Foundation → Runtime → Engine → Intelligence (ICE AI) → Consciousness → Interfaces**
+
+Within this structure:
+
+- Runtime enforces execution and authority
+- Engine coordinates causality and flow
+- ICE AI produces intent, plans, and decisions
+- Consciousness preserves memory and meaning
+
+ICE AI has **no execution authority**.
+It cannot bypass governance or reconfigure execution directly.
+
+---
+
+## What ICE AI Is
+
+ICE AI is:
+
+- an **agentic reasoning layer**
+- a **planning and decision system**
+- a **goal and constraint interpreter**
+- a **coordination layer for agents and tools**
+- a **producer of structured intent**
+
+It exists to transform goals and context
+into **explicit, inspectable decisions**.
+
+---
+
+## What ICE AI Is Not
+
+ICE AI is **not**:
+
+- a runtime
+- an execution engine
+- a memory system
+- a source of authority
+- a raw model provider
+- a text-generation wrapper
+
+ICE AI does not “act”.
+It **decides what should be acted upon**.
 
 ---
 
@@ -21,67 +78,80 @@ It provides **structured intelligence**, **decision-making**, and
 
 ICE AI is responsible for:
 
-- Defining agent types, roles, and capabilities
-- Planning and routing complex tasks
-- Analyzing code, projects, and system state
-- Reasoning over goals, constraints, and context
-- Interfacing with LLMs through controlled adapters
-- Producing decisions, not just generations
+- defining agent roles, capabilities, and boundaries
+- decomposing objectives into executable plans
+- reasoning over goals, constraints, and context
+- analyzing codebases, projects, and system state
+- coordinating agents and tool usage
+- interfacing with language models through controlled adapters
+- producing decisions, not just text output
+
+All outputs of ICE AI are **intentions**, not actions.
 
 ---
 
-## Agentic Scope
+## Agentic Model
 
-ICE AI operates at the **decision and action layer**.
+ICE AI treats agents as **first-class system components**.
 
-It does not:
-- manage system lifecycle
-- store long-term knowledge
-- define public APIs
-- control low-level execution
+Key principles:
 
-It does:
-- interpret intent
-- decompose objectives into tasks
-- coordinate agents and tools
-- reason over memory and context
-- produce structured outcomes
+- reasoning is separated from execution
+- planning precedes generation
+- decisions are explicit and structured
+- probabilistic models are wrapped in deterministic scaffolding
+- language models are tools, not authorities
+
+Intelligence without control is noise.
+ICE AI exists to prevent that.
 
 ---
 
-## Design Principles
+## Governance and Constraints
 
-- Agents as first-class system components
-- Explicit separation between reasoning and execution
-- Planning before generation
-- Decisions over raw text output
-- LLMs treated as tools, not authorities
-- Deterministic structures around probabilistic models
+ICE AI operates under strict governance:
+
+- it cannot authorize execution
+- it cannot act autonomously
+- it cannot bypass Runtime or Engine constraints
+- it cannot adapt implicitly
+- all decisions must remain traceable and attributable
+
+Governance constraints are inherited from ICE Foundation
+and are non-negotiable.
 
 ---
 
-## Usage
+## Usage Model
 
 ICE AI is not a standalone product.
 
-It is consumed by:
+It is embedded by:
+
 - ICE Runtime
 - ICE Engine
 - ICE Studio
-- Automation and orchestration layers
+- automation and orchestration layers
 
-ICE AI agents operate **within** the ICE system, never in isolation.
-
----
-
-## Status
-
-This project is under **active development**.
-Agent models and reasoning strategies may evolve as the system matures.
+ICE AI agents operate **within** the ICE system,
+never in isolation and never without governance.
 
 ---
 
-## License
+## Canonical Status
 
-This project is licensed under the terms of the MIT license.
-See the `LICENSE` file for details.
+ICE AI is an **intelligence provider**, not an authority.
+
+If ICE AI behavior attempts to execute actions,
+override governance,
+or self-authorize decisions,
+it is incorrect by definition.
+
+---
+
+## Notes
+
+Intelligence systems fail when reasoning and execution blur.
+
+ICE AI exists to keep them separate,
+even when doing so makes systems harder to build.
