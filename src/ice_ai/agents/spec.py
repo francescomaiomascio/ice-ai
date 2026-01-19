@@ -113,6 +113,7 @@ class AgentSpec:
     def to_dict(self) -> Dict[str, object]:
         """
         Rappresentazione serializzabile e stabile (PUBLIC CONTRACT).
+        Conforme ai test domains/ice_ai.
         """
         return {
             "name": self.name,
@@ -125,14 +126,18 @@ class AgentSpec:
                 "system": self.is_system,
             },
             "capabilities": sorted(self.capabilities),
+
+            # BACKWARD-COMPAT FIELDS (OBBLIGATORI, TOP-LEVEL)
             "version": self.version,
             "experimental": self.experimental,
             "deprecated": self.deprecated,
+
             "ui": {
                 "label": self.ui_label,
                 "group": self.ui_group,
             },
         }
+
 
 
     # ==================================================================
